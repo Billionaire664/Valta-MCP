@@ -1,0 +1,32 @@
+{
+  "name": "valta-mcp",
+  "version": "0.1.0",
+  "description": "MCP server for Valta — financial governance for AI agents. Spend gates and audit trail exposed as MCP tools.",
+  "type": "module",
+  "bin": {
+    "valta-mcp": "./dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "files": ["dist"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Billionaire664/valta-mcp.git"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.4.0"
+  },
+  "license": "MIT",
+  "keywords": ["mcp", "model-context-protocol", "ai-agents", "spend-gate", "financial-guardrails"]
+}
