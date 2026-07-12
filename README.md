@@ -53,7 +53,14 @@ Add to your MCP client's config (e.g. Claude Desktop's `claude_desktop_config.js
 | `valta_freeze_agent` | Kill switch — freeze an agent's wallet, blocking further spend |
 | `valta_unfreeze_agent` | Resume a frozen agent's wallet |
 | `valta_get_audit_trail` | Read the hash-chained audit trail of spend decisions |
-
+| `valta_list_wallets` | List all named wallets on the account — use this to discover wallet names before checking balance/spending |
+| `valta_transfer_funds` | Transfer USDC directly between two of your agent wallets |
+| `valta_list_agents` | List all agents on the account |
+| `valta_get_agent` | Get details for a single agent |
+| `valta_run_agent` | Trigger an agent to run a task |
+| `valta_get_agent_run` | Check the status/result of a specific agent run |
+| `valta_list_policies` | List spending policies configured on the account |
+| `valta_set_policy` | Create a new spending policy (daily cap, per-transaction cap) |
 Every tool's description in [`src/index.ts`](./src/index.ts) states plainly what it enforces and what it doesn't — read those before wiring this into anything that touches real money.
 
 ## Design notes
