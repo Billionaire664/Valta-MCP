@@ -1,7 +1,7 @@
 {
   "name": "valta-mcp",
   "mcpName": "io.github.Billionaire664/valta-mcp",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "MCP server for Valta — financial governance for AI agents. Spend gates and audit trail exposed as MCP tools.",
   "type": "module",
   "bin": {
