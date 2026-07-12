@@ -127,4 +127,54 @@ export class ValtaClient {
       }>;
     }>("GET", `/audit?${params.toString()}`);
   }
+
+  listWallets() {
+    return this.request<{ success: boolean; wallets: any[] }>("GET", "/wallets");
+  }
+
+  transferFunds(params: { fromAgentId: string; toAgentId: string; amount: number; description?: string }) {
+    return this.request<{ success: boolean }>("POST", "/wallet/transfer", params);
+  }
+
+  listAgents(limit = 20, offset = 0) {
+    const params = new URLSearchParams({ limit: String(limit), offset: String(offset) });
+    return this.request<{ success: boolean; agents: any[]; total: number }>(
+      "GET",
+      `/agents?${params.toString()}`
+    );
+  }
+
+  getAgent(agentId: string) {
+    return this.request<{ success: boolean; agent: any }>("GET", `/agents/${encodeURIComponent(agentId)}`);
+  }
+
+  runAgent(agentId: string, task: string, context?: string) {
+    return this.request<{ success: boolean; executionId: string }>(
+      "POST",
+      `/agents/${encodeURIComponent(agentId)}/run`,
+      { task, context }
+    );
+  }
+
+  getAgentRun(agentId: string, runId: string) {
+    return this.request<{ success: boolean; run: any }>(
+      "GET",
+      `/agents/${encodeURIComponent(agentId)}/runs/${encodeURIComponent(runId)}`
+    );
+  }
+
+  listPolicies(agentId?: string) {
+    const params = new URLSearchParams();
+    if (agentId) params.set("agentId", agentId);
+    return this.request<{ success: boolean; policies: any[] }>("GET", `/policies?${params.toString()}`);
+  }
+
+  setPolicy(params: {
+    name: string;
+    agentId?: string;
+    maxSpendPerDay?: number;
+    maxSpendPerTransaction?: number;
+  }) {
+    return this.request<{ success: boolean; policy: any }>("POST", "/policies", params);
+  }
 }
