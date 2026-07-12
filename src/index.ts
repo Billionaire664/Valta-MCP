@@ -18,7 +18,7 @@ const valta = new ValtaClient(apiKey, baseUrl);
 
 const server = new McpServer({
   name: "valta-mcp",
-  version: "0.1.0",
+  version: "0.1.4",
 });
 
 function errorResult(err: unknown) {
@@ -295,6 +295,55 @@ server.tool(
     try {
       const result = await valta.setPolicy({ name, agentId, maxSpendPerDay, maxSpendPerTransaction });
       return { content: [{ type: "text", text: JSON.stringify(result.policy, null, 2) }] };
+    } catch (err) {
+      return errorResult(err);
+    }
+  }
+);
+
+server.tool(
+  "valta_proxy_request",
+  "Make a real outbound API call to a connected service (e.g. Stripe) through Valta's " +
+    "spend-gated egress proxy, instead of calling the provider directly. Declare the " +
+    "amount this call will cost up front — Valta checks it against the agent's wallet " +
+    "limits (freeze state, per-transaction/daily/monthly caps, approval thresholds) and " +
+    "only makes the real request if approved, using the account's own stored credential " +
+    "for that service. If the upstream call fails, the declared amount is automatically " +
+    "refunded. Only services with proxying enabled can be called this way — currently: " +
+    "stripe, serper, polygon.",
+  {
+    agentId: z.string().describe("The Valta agent/wallet ID or name this spend is attributed to"),
+    service: z.string().describe('The connected service to call, e.g. "stripe"'),
+    method: z.enum(["GET", "POST", "PUT", "PATCH", "DELETE"]).describe("HTTP method for the upstream call"),
+    path: z.string().describe("Path on the service's API, relative to its base URL, e.g. \"/v1/customers\""),
+    body: z.record(z.any()).optional().describe("Optional JSON body to send with the request"),
+    amount: z.number().positive().describe("Declared cost of this call in USD — checked against wallet limits before the real call is made"),
+    description: z.string().describe("What this call is for — recorded in the audit trail"),
+    category: z.string().optional().describe("Optional spend category"),
+  },
+  async ({ agentId, service, method, path, body, amount, description, category }) => {
+    try {
+      const result = await valta.proxyRequest({ agentId, service, method, path, body, amount, description, category });
+      return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+    } catch (err) {
+      return errorResult(err);
+    }
+  }
+);
+
+server.tool(
+  "valta_list_proxy_requests",
+  "List the receipts for every call made through Valta's spend-gated egress proxy — " +
+    "what was allowed, blocked, refunded, or left pending approval, and why. Optionally " +
+    "filter to one agent.",
+  {
+    agentId: z.string().optional().describe("Optional — filter to one agent's proxy requests"),
+    limit: z.number().int().positive().max(100).optional().describe("Max results, default 20"),
+  },
+  async ({ agentId, limit }) => {
+    try {
+      const result = await valta.listProxyRequests(agentId, limit ?? 20);
+      return { content: [{ type: "text", text: JSON.stringify(result.requests, null, 2) }] };
     } catch (err) {
       return errorResult(err);
     }
