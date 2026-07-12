@@ -162,6 +162,145 @@ server.tool(
   }
 );
 
+server.tool(
+  "valta_list_wallets",
+  "List all named Valta wallets on this account, with balances and limits. Use this " +
+    "to discover what wallets exist before checking a balance or requesting a spend — " +
+    "you need to know the exact wallet name/ID first.",
+  {},
+  async () => {
+    try {
+      const result = await valta.listWallets();
+      return { content: [{ type: "text", text: JSON.stringify(result.wallets, null, 2) }] };
+    } catch (err) {
+      return errorResult(err);
+    }
+  }
+);
+
+server.tool(
+  "valta_transfer_funds",
+  "Transfer USDC directly between two of your agent wallets.",
+  {
+    fromAgentId: z.string().describe("Wallet ID or name sending funds"),
+    toAgentId: z.string().describe("Wallet ID or name receiving funds"),
+    amount: z.number().positive().describe("Amount in USDC to transfer"),
+    description: z.string().optional().describe("Optional description of the transfer"),
+  },
+  async ({ fromAgentId, toAgentId, amount, description }) => {
+    try {
+      const result = await valta.transferFunds({ fromAgentId, toAgentId, amount, description });
+      return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+    } catch (err) {
+      return errorResult(err);
+    }
+  }
+);
+
+server.tool(
+  "valta_list_agents",
+  "List all agents on this account — both marketplace subscriptions and custom SDK-created agents.",
+  {
+    limit: z.number().int().positive().optional().describe("Max results, default 20"),
+    offset: z.number().int().nonnegative().optional().describe("Pagination offset, default 0"),
+  },
+  async ({ limit, offset }) => {
+    try {
+      const result = await valta.listAgents(limit ?? 20, offset ?? 0);
+      return { content: [{ type: "text", text: JSON.stringify(result.agents, null, 2) }] };
+    } catch (err) {
+      return errorResult(err);
+    }
+  }
+);
+
+server.tool(
+  "valta_get_agent",
+  "Get details for a single agent, including status and balance.",
+  {
+    agentId: z.string().describe("The agent ID to look up"),
+  },
+  async ({ agentId }) => {
+    try {
+      const result = await valta.getAgent(agentId);
+      return { content: [{ type: "text", text: JSON.stringify(result.agent, null, 2) }] };
+    } catch (err) {
+      return errorResult(err);
+    }
+  }
+);
+
+server.tool(
+  "valta_run_agent",
+  "Trigger an agent to run a task. Returns the run's execution ID and initial status.",
+  {
+    agentId: z.string().describe("The agent ID to run"),
+    task: z.string().describe("The task instruction for the agent to execute"),
+    context: z.string().max(2000).optional().describe("Optional additional context, max 2000 characters"),
+  },
+  async ({ agentId, task, context }) => {
+    try {
+      const result = await valta.runAgent(agentId, task, context);
+      return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+    } catch (err) {
+      return errorResult(err);
+    }
+  }
+);
+
+server.tool(
+  "valta_get_agent_run",
+  "Check the status and result of a specific agent run.",
+  {
+    agentId: z.string().describe("The agent ID the run belongs to"),
+    runId: z.string().describe("The run ID to check"),
+  },
+  async ({ agentId, runId }) => {
+    try {
+      const result = await valta.getAgentRun(agentId, runId);
+      return { content: [{ type: "text", text: JSON.stringify(result.run, null, 2) }] };
+    } catch (err) {
+      return errorResult(err);
+    }
+  }
+);
+
+server.tool(
+  "valta_list_policies",
+  "List spending policies (limits, approval thresholds) configured on this account, optionally filtered to one agent.",
+  {
+    agentId: z.string().optional().describe("Optional — filter to policies for a single agent"),
+  },
+  async ({ agentId }) => {
+    try {
+      const result = await valta.listPolicies(agentId);
+      return { content: [{ type: "text", text: JSON.stringify(result.policies, null, 2) }] };
+    } catch (err) {
+      return errorResult(err);
+    }
+  }
+);
+
+server.tool(
+  "valta_set_policy",
+  "Create a new spending policy — a named limit configuration (daily cap, per-transaction " +
+    "cap) that can be applied to an agent's spend.",
+  {
+    name: z.string().describe("A name for this policy"),
+    agentId: z.string().optional().describe("Optional — the agent this policy applies to"),
+    maxSpendPerDay: z.number().positive().optional().describe("Maximum USDC spend per day"),
+    maxSpendPerTransaction: z.number().positive().optional().describe("Maximum USDC per single transaction"),
+  },
+  async ({ name, agentId, maxSpendPerDay, maxSpendPerTransaction }) => {
+    try {
+      const result = await valta.setPolicy({ name, agentId, maxSpendPerDay, maxSpendPerTransaction });
+      return { content: [{ type: "text", text: JSON.stringify(result.policy, null, 2) }] };
+    } catch (err) {
+      return errorResult(err);
+    }
+  }
+);
+
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
