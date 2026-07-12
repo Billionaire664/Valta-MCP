@@ -177,4 +177,43 @@ export class ValtaClient {
   }) {
     return this.request<{ success: boolean; policy: any }>("POST", "/policies", params);
   }
+
+  proxyRequest(params: {
+    agentId: string;
+    service: string;
+    method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+    path: string;
+    body?: unknown;
+    amount: number;
+    description: string;
+    category?: string;
+  }) {
+    return this.request<
+      | { success: true; status: number; body: unknown; newBalance: number }
+      | { error: string; requiresApproval: true; requestId?: string }
+    >("POST", "/proxy", params);
+  }
+
+  listProxyRequests(agentId?: string, limit: number = 20) {
+    const params = new URLSearchParams();
+    if (agentId) params.set("agentId", agentId);
+    params.set("limit", String(limit));
+    return this.request<{
+      success: boolean;
+      requests: Array<{
+        id: string;
+        agentId: string;
+        service: string;
+        method: string;
+        path: string;
+        amount: number;
+        decision: "allowed" | "blocked" | "refunded" | "pending_approval";
+        reason: string | null;
+        responseStatus: number | null;
+        description: string | null;
+        createdAt: string;
+      }>;
+      pagination: { page: number; limit: number; total: number; hasMore: boolean; totalPages: number };
+    }>("GET", `/proxy/requests?${params.toString()}`);
+  }
 }
