@@ -1,10 +1,11 @@
-
-# valta-mcp
+[README (2).md](https://github.com/user-attachments/files/30159268/README.2.md)# valta-mcp
 
 [![CI](https://github.com/Billionaire664/valta-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/Billionaire664/valta-mcp/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
 An MCP (Model Context Protocol) server for [Valta](https://valta.co) — financial governance for AI agents. Exposes Valta's spend gate and audit trail as MCP tools, so any MCP-compatible client (Claude Desktop, Claude Code, Cursor, and others) can call them directly.
+
+![How Valta MCP works](docs/how-it-works.png)
 
 ## What this is — and isn't
 
