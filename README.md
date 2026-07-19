@@ -5,7 +5,7 @@
 
 An MCP (Model Context Protocol) server for [Valta](https://valta.co) — financial governance for AI agents. Exposes Valta's spend gate and audit trail as MCP tools, so any MCP-compatible client (Claude Desktop, Claude Code, Cursor, and others) can call them directly.
 
-![Uploading valtamcpflow.png…]()
+![How Valta MCP works](docs/valtamcpflow.png)
 
 
 ## What this is — and isn't
