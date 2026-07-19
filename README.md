@@ -1,4 +1,4 @@
-[README (2).md](https://github.com/user-attachments/files/30159268/README.2.md)# valta-mcp
+# valta-mcp
 
 [![CI](https://github.com/Billionaire664/valta-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/Billionaire664/valta-mcp/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
